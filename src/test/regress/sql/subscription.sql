@@ -39,6 +39,7 @@ SELECT subname, stats_reset IS NULL stats_reset_is_null FROM pg_stat_subscriptio
 
 -- Reset the stats again and check if the new reset_stats is updated.
 SELECT stats_reset as prev_stats_reset FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub' \gset
+SELECT pg_sleep(0.01);  -- assume a minimum timestamp granularity of 10ms
 SELECT pg_stat_reset_subscription_stats(oid) FROM pg_subscription WHERE subname = 'regress_testsub';
 SELECT :'prev_stats_reset' < stats_reset FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub';
 

@@ -467,6 +467,7 @@ SELECT stats_reset > :'slru_commit_ts_reset_ts'::timestamptz FROM pg_stat_slru W
 SELECT stats_reset AS slru_commit_ts_reset_ts FROM pg_stat_slru WHERE name = 'commit_timestamp' \gset
 
 -- Test that multiple SLRUs are reset when no specific SLRU provided to reset function
+SELECT pg_sleep(0.01); -- assume a minimum timestamp granularity of 10ms
 SELECT pg_stat_reset_slru();
 SELECT stats_reset > :'slru_commit_ts_reset_ts'::timestamptz FROM pg_stat_slru WHERE name = 'commit_timestamp';
 SELECT stats_reset > :'slru_notify_reset_ts'::timestamptz FROM pg_stat_slru WHERE name = 'notify';
@@ -493,6 +494,7 @@ SELECT stats_reset > :'recovery_prefetch_reset_ts'::timestamptz FROM pg_stat_rec
 
 -- Test that reset_shared with slru specified as the stats type works
 SELECT max(stats_reset) AS slru_reset_ts FROM pg_stat_slru \gset
+SELECT pg_sleep(0.01);
 SELECT pg_stat_reset_shared('slru');
 SELECT max(stats_reset) > :'slru_reset_ts'::timestamptz FROM pg_stat_slru;
 
@@ -509,6 +511,7 @@ SELECT pg_stat_reset_shared('unknown');
 -- Since pg_stat_database stats_reset starts out as NULL, reset it once first so we have something to compare it to
 SELECT pg_stat_reset();
 SELECT stats_reset AS db_reset_ts FROM pg_stat_database WHERE datname = (SELECT current_database()) \gset
+SELECT pg_sleep(0.01);
 SELECT pg_stat_reset();
 SELECT stats_reset > :'db_reset_ts'::timestamptz FROM pg_stat_database WHERE datname = (SELECT current_database());
 
